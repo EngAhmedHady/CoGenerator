@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12538002.svg)](https://doi.org/10.5281/zenodo.12538002)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/EngAhmedHady/CoGenerator/blob/main/LICENSE)
+
 # CoGenerator Library
 Defining measurement positions on a curved wall posed a significant challenge, particularly, a curvature of airfoil or blade profile. To address this issue, a Python script was developed in collaboration with a CAD model, facilitating the precise determination of measurement locations.
 
