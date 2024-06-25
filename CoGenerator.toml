@@ -1,0 +1,22 @@
+[project]
+name = "CoGenerator Library"
+version = "1.3.0"
+authors = [
+  { name="Ahmed H. Hanfy", email="ahmed.hady.hanfy92@gmail.com" },
+  { name="Pawel Flaszyński"},
+  { name="Piotr Kaczyński"},
+  { name="Piotr Doerffer" },
+]
+description = "A Python library utilizes aerofoil model data and real-world coordinates, facilitating the precise determination of measurement locations such as the boundary layer over the aerofoil and cascade traverse.  The library uses numpy and matplotlib libraries"
+readme = "README.md"
+requires-python = ">=3.11"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = ""
+Issues = "/issues"
