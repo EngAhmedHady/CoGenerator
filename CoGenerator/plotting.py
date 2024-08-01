@@ -1,6 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import transforms
 import matplotlib.patches as mpatch
 
 def ImageVisualization(ax, lazer_info: list[list[float]], 
@@ -12,9 +13,9 @@ def ImageVisualization(ax, lazer_info: list[list[float]],
     Parameters:
         - **ax (matplotlib.axes.Axes)**: The axes on which to plot the data.
         - **LAZERinfo (list[list[float]])**: List of [x, y,...] coordinates to plot.
-        - **BG (tuple[str, tuple[int, int, int, int]], optional)**: Tuple containing
+        - **BG (tuple[str, tuple[int], float], optional)**: Tuple containing
         the path to a background image and the image extent adjustments as 
-        (left, right, top, bottom). Defaults to None.
+        (left, right, top, bottom) and rotation if required. Defaults to None.
         - **reverse (bool)**: Whether to reverse the x-axis. Defaults to True.
 
     Keyword Arguments:
@@ -23,8 +24,10 @@ def ImageVisualization(ax, lazer_info: list[list[float]],
         - **xlabel (str)**: Label for the x-axis. Defaults to r'$X$[mm]'.
         - **ylabel (str)**: Label for the y-axis. Defaults to r'$Y$[mm]'.
         - **BGcolor (str)**: Background color of the plot. Defaults to 'white'.
-        - **figxlim (list[int, int])**: X-axis limits as [min, max]. Defaults to [0, 0].
-        - **figylim (list[int, int])**: Y-axis limits as [min, max]. Defaults to [0, 0].
+        - **figxlim (list[int, int])**: X-axis limits as [min, max]. 
+                                       Defaults to [0, 0].
+        - **figylim (list[int, int])**: Y-axis limits as [min, max]. 
+                                        Defaults to [0, 0].
 
     Returns:
         - **ax (matplotlib.axes.Axes)**: The modified axes with the plot.
@@ -61,13 +64,21 @@ def ImageVisualization(ax, lazer_info: list[list[float]],
     # If a background image is provided, display it
     if BG is not None:
         image_path = BG[0]
-        Image_str = BG[1]
+        image_str = BG[1]
+        im_rotate = 0
+        if len(BG) > 2: 
+            im_rotate = BG[2]
+    
         img = plt.imread(image_path)
-        ax.imshow(img, extent=[x[0]-Image_str[0], x[1]+Image_str[1],
-                                y[0]+Image_str[2], y[1]-Image_str[3]])
+        tr = transforms.Affine2D().rotate_deg(im_rotate)
+        ax.imshow(img, 
+                  extent=[x[0]-image_str[0], x[1]+image_str[1],
+                          y[0]+image_str[2], y[1]-image_str[3]],
+                  transform = tr + ax.transData)
 
     # Configure the grid
-    ax.grid(grid_on, which='major', color='#D8D8D8', linestyle='-', alpha=0.2, lw=1.5)
+    ax.grid(grid_on, which='major', color='#D8D8D8', 
+            linestyle='-', alpha=0.2, lw=1.5)
     ax.minorticks_on()
     ax.grid(grid_on, which='minor', color='#D8D8D8', linestyle='-', alpha=0.1)
     
@@ -118,10 +129,13 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
 
     x3 = kwargs.get('x3', None)
     y3 = kwargs.get('y3', None)
+    a3 = kwargs.get('a3', None)
     x4 = kwargs.get('x4', None)
     y4 = kwargs.get('y4', None)
+    m4 = kwargs.get('m4', None)
     Theta = kwargs.get('Theta', None)
     dim_size = kwargs.get('dim_size', 30)
+    points_size = kwargs.get('points_size', 8)
     text_color = kwargs.get('text_color', 'w')
     arrows_color = kwargs.get('arrows_color', 'w')
     ngtiv_dim_size = kwargs.get('ngtiv_dim_size', dim_size)
@@ -193,11 +207,24 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
             size=H_shift_dim_size, color=text_color)
 
     if x3 is not None:
-        # distance on chord
+        # lengths on chord
         x_coord = [o_x, Origin_TE[0], x3]
         y_coord = [o_y, Origin_TE[1], y3]
         y_coord = [x for _, x in sorted(zip(x_coord, y_coord))]
         ax.plot(sorted(x_coord), y_coord, 'r--', ms=10, label='_Hidden')
+
+        chord_len = np.sqrt((o_x-Origin_TE[0])**2+(o_y-Origin_TE[1])**2)
+        x_other = profile2_LE[0] + chord_len * np.cos(np.deg2rad(AOA_Deg))
+        y_other = profile2_LE[1] + chord_len * np.sin(np.deg2rad(AOA_Deg))
+
+        ax.plot(x_other, y_other, 'x', label='_Hidden', 
+                ms=points_size, color = 'tab:orange')
+        ax.plot([Origin_TE[0], x_other],
+                [Origin_TE[1], y_other],
+                'y--', ms=5, linewidth=0.5, label='_Hidden')
+        ax.plot([profile2_LE[0], o_x],
+                [profile2_LE[1], o_y],
+                'y--', ms=5, linewidth=0.5, label='_Hidden')
 
         # Chord extension length
         L3 = np.sqrt((o_x-x3)**2+(o_y-y3)**2)
@@ -205,22 +232,47 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
                 f"{L3:0.2f}", {'ha': 'center', 'va': 'center'},
                 size=Chord_ext_dim_size, color='r',
                 rotation = AOA_Deg)
-        # ---------
-        p4 = np.array([x4, y4])
-        L4 = np.linalg.norm(profile2_LE[:2] - p4)
-        ax.plot([Origin_LE[0], profile2_LE[0], x4],
-                [Origin_LE[1], profile2_LE[1], y4],
-                'y--', ms=5, linewidth=0.5, label='_Hidden')
-
+        
+        # perpendicular line length from origin to the line
         DegTheta3 = Theta*180/np.pi
-        rect = mpatch.Rectangle((x4, y4), 2, 2, facecolor='y',
-                                angle=270+DegTheta3)
-        ax.add_patch(rect)
+        if H_shift < 0  and L3 > chord_len:
+            y1 = o_y + v_start
+            y2 = o_y - (v_length-v_start)
+            m3 = (y1 - y2)/(x_start - x_last)
+            m4 = -1/m3
+            a3 = y1 - m3 * x_start
+            a4 = y_other - m4 * x_other
+            x4 = (a3-a4)/(m4-m3)
+            y4 = m4*x4+a4
+            p4 = np.array([x4, y4])
+            L4 = np.linalg.norm(np.array([x_other, y_other]) - p4)
+            ax.plot([x_other, x4],
+                    [y_other, y4],
+                    'y--', ms=5, linewidth=0.5, label='_Hidden')
+            
+            rect = mpatch.Rectangle((x4, y4), 2, 2, facecolor='y',
+                                    angle=270+DegTheta3)
+            ax.add_patch(rect)
 
-        ax.text(((profile2_LE[0]+x4)/2)+2,
-                ((profile2_LE[1]+y4)/2)+2, str(round(L4, 2)),
-                {'ha': 'center', 'va': 'center'}, size=30, color='y',
-                rotation=270+DegTheta3)
+            ax.text(((x_other+x4)/2)+2,
+                    ((y_other+y4)/2)+2, str(round(L4, 2)),
+                    {'ha': 'center', 'va': 'center'}, size=30, color='y',
+                    rotation=270+DegTheta3)
+        else:
+            p4 = np.array([x4, y4])
+            L4 = np.linalg.norm(profile2_LE[:2] - p4)
+            ax.plot([profile2_LE[0], x4],
+                    [profile2_LE[1], y4],
+                    'y--', ms=5, linewidth=0.5, label='_Hidden')
+
+            rect = mpatch.Rectangle((x4, y4), 2, 2, facecolor='y',
+                                    angle=270+DegTheta3)
+            ax.add_patch(rect)
+
+            ax.text(((profile2_LE[0]+x4)/2)+2,
+                    ((profile2_LE[1]+y4)/2)+2, str(round(L4, 2)),
+                    {'ha': 'center', 'va': 'center'}, size=30, color='y',
+                    rotation=270+DegTheta3)
     
     return ax
             

@@ -24,7 +24,7 @@ if __name__ == '__main__':
     #               [323.7721016,5.59196630381,367.20],   # Trailing edge coordinates lower blade "Measured" [x01,y01,z01]
     #               [273.616941797,58.896306915,367.20]]   # Leading  edge coordinates Upper blade "Measured"
                    # [275.616941797,58.896306915,367.20]]   # Leading  edge coordinates Upper blade "Measured" [x10,y10,z10]
-    
+    # TEAMAero Arun
     LAZERinfo = [[126.00,-134.50,362.60],   # Leading  edge coordinates lower blade "Measured" [x00,y00,z00]
                   [173.615,-149.118,362.60],   # Trailing edge coordinates lower blade "Measured" [x01,y01,z01]
                   [103.30,-155.30,362.60]]   # Leading  edge coordinates Upper blade "Measured"
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     ProfileImgSize   = [2.5,5.5,15.5,6] # [Left, Right, Bottom, Top]
     
     Schlieren_path   = r"Co-fig\Profile_Sch.jpg"
-    SchlierenImgSize = [49,65,85.5,36.5] # [Left, Right, Bottom, Top]
+    SchlierenImgSize = [49,67.5,89.8,35.5] # [Left, Right, Bottom, Top]
     
     Fully_Open_path   = r"Co-fig\Fully_Open_Sch.jpg"
     Fully_OpenImgSize = [49,67,82,42] # [Left, Right, Bottom, Top]
@@ -42,13 +42,13 @@ if __name__ == '__main__':
     testsection_model_pathImgSize = [58,88.5,112.5,56.8] # [Left, Right, Bottom, Top]
     
     Arun_model_path   = "Co-fig\\11(edge).jpg"
-    Arun_model_pathImgSize = [95,98.5,67,75] # [Left, Right, Bottom, Top]
+    Arun_model_pathImgSize = [96,98.5,67,75] # [Left, Right, Bottom, Top]
     
-    BG = [[Profile_path  ,  ProfileImgSize],
-              [Schlieren_path,SchlierenImgSize],
-              [Fully_Open_path,Fully_OpenImgSize],
-              [testsection_model_path,testsection_model_pathImgSize],
-              [Arun_model_path, Arun_model_pathImgSize]]
+    BG = [[Profile_path,  ProfileImgSize],
+          [Schlieren_path, SchlierenImgSize, -0.3],
+          [Fully_Open_path, Fully_OpenImgSize],
+          [testsection_model_path, testsection_model_pathImgSize],
+          [Arun_model_path, Arun_model_pathImgSize]]
     
     Co_Generator = CG(LAZERinfo,BG[4]);
     
@@ -68,13 +68,15 @@ if __name__ == '__main__':
     # Co_Generator.LineGenerator(lineInfo, invert = False, inclination = 'ParallelToLEs',
     #                             arrows_color = 'w', text_color = 'w',
     #                             legend_loc = 'lower right', legend_fsize = 20,
-    #                             figxlim = [-80,120], figylim = [-40,80], BGcolor = 'k')
+    #                             figxlim = [-80,160], figylim = [-40,80], BGcolor = 'k')
     
-    # lineInfo = [32,50,57,20] # [starting point, H-line distance, Vertical length, N-points]
-    # Co_Generator.LineGenerator(lineInfo, invert = False, inclination = 'ParallelToLEs',
-    #                             arrows_color = 'w', text_color = 'w',
-    #                             legend_loc = 'lower right', legend_fsize = 20,
-    #                             figxlim = [-120,100], figylim = [-60,40], BGcolor = 'k')
+    lineInfo = [32,50,57,20] # [starting point, H-line distance, Vertical length, N-points]
+    Co_Generator.LineGenerator(lineInfo, invert = False, inclination = 'ParallelToLEs',
+                               # NPR = [[4,10],[6,31]]
+                                # arrows_color = 'w', text_color = 'w',
+                                # legend_loc = 'lower right', legend_fsize = 20,
+                                # figxlim = [-120,100], figylim = [-60,40], BGcolor = 'k'
+                                )
     
     chord_len = np.linalg.norm(np.array([126.00,-134.50])-np.array([173.615,-149.118]))
     print(chord_len)
@@ -82,9 +84,17 @@ if __name__ == '__main__':
     l_angle = abs(np.tan((-134.50-(-155.30))/(126.00-103.30)))
     theta = 90-alpha-l_angle
     
-    l_len = (chord_len-2.75)*np.cos(theta)+10
+    # l_len = (chord_len-2.8765)*np.cos(theta)+5
     
-    lineInfo = [15,-l_len,55,20] # [starting point, H-line distance, Vertical length, N-points]
+    # lineInfo = [20,-l_len,60,40] # [starting point, H-line distance, Vertical length, N-points]
+    # # lineInfo = [32,50,57,20] # [starting point, H-line distance, Vertical length, N-points]
+    # Co_Generator.LineGenerator(lineInfo, invert = False, 
+    #                            inclination = 'ParallelToLEs', 
+    #                            preview_lengths = False,)
+    
+    l_len = (chord_len-2.8765)*np.cos(theta)+10
+    
+    lineInfo = [17.5,-l_len,65,40] # [starting point, H-line distance, Vertical length, N-points]
     # lineInfo = [32,50,57,20] # [starting point, H-line distance, Vertical length, N-points]
     Co_Generator.LineGenerator(lineInfo, invert = False, inclination = 'ParallelToLEs',
                                 arrows_color = 'w', text_color = 'w',

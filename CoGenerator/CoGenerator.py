@@ -32,6 +32,7 @@ class CoordinatesGenerator:
         # Lower profile cord info, # Chord line slope
         delta_y = lazer_info[0][1] - lazer_info[1][1]
         delta_x = lazer_info[0][0] - lazer_info[1][0]
+        # AOA calculation
         if delta_x == 0:
             self.m1 = float('inf')  # to handle the vertical line case
         else:
@@ -39,7 +40,7 @@ class CoordinatesGenerator:
 
         self.a1 = lazer_info[0][1]-(self.m1*lazer_info[0][0])  # .... y-intercept
         self.Theta1 = np.arctan(self.m1)  # Chordline Angle to Horizontal (Rad)
-        # Chordline Angle to Horizontal (Deg)
+        # Chordline Angle to Horizontal (AOA-Deg)
         self.DegTheta1 = self.Theta1*180/np.pi
         self.fig, self.ax = plt.subplots(figsize=(30, 15),
                                          gridspec_kw={'hspace': 0.05})
@@ -51,7 +52,7 @@ class CoordinatesGenerator:
             f.write(f"Leading  edge Lazer co. [x,y,z]: \t {lazer_info[2]}\n")
 
     def PointGenerator(self, StartingPoint, n_points, NPR,
-                       Delta=[0, 0], V_Delta=[], slope=0, Dis=0,
+                       Delta=[0, 0], V_Delta = None, slope=0, Dis=0,
                        PointType='BL', **kwargs):
 
         legend_loc = kwargs.get('legend_loc', 'best')
@@ -68,9 +69,9 @@ class CoordinatesGenerator:
         Counter = 0
         points_color = kwargs.get('points_color', 'C{}'.format(Counter))
 
-        if V_Delta != []:
+        if V_Delta is not None:
             D = 0
-            nNPR = 0
+        nNPR = 0
 
         # NPR is the number of points per run, it can be constant number or
         # an array (Defulte = 6)
@@ -87,7 +88,7 @@ class CoordinatesGenerator:
             else:
                 NPPR = NPR
             while k < NPPR and i < n_points:
-                if V_Delta != []:
+                if V_Delta is not None:
                     if Dis >= V_Delta[D][1]:
                         D += 1
                     Delta[0] = np.sqrt(V_Delta[D][0]**2/(slope**2+1))
@@ -157,8 +158,8 @@ class CoordinatesGenerator:
             LineLength = v_length
             Theta = np.pi/2
         elif inclination == 'ParallelToLEs':
-            print('Chord Solpe = ',self.m1,
-                  ',\nChord y-intercept = ',self.a1,
+            print('Chord Slope = ', self.m1,
+                  ',\nChord y-intercept = ', self.a1,
                   ',\nChordline Angle to Horizontal = ', self.DegTheta1)
             
             m3 = (Origin[1]-UpperLE[1])/(Origin[0]-UpperLE[0])
@@ -180,13 +181,15 @@ class CoordinatesGenerator:
             y3 = m3*x3+a3
             kwargs['x3'] = x3
             kwargs['y3'] = y3
-
-            m4 = -1/m3
+            kwargs['a3'] = a3
+            if m3 != 0:  m4 = -1/m3 # perpendicular line
+            else: m4 = np.inf
             a4 = self.LazerLE_upper[1]-m4*self.LazerLE_upper[0]
             x4 = (a3-a4)/(m4-m3)
             y4 = m4*x4+a4
             kwargs['x4'] = x4
             kwargs['y4'] = y4
+            kwargs['m4'] = a3
 
         Delta_l_new = LineLength/(n_points-1)
 
@@ -201,7 +204,7 @@ class CoordinatesGenerator:
                                               Delta = [-(Delta_l_new*np.cos(Theta)), -(Delta_l_new*np.sin(Theta))],
                                               PointType='L', **kwargs)
         with open('Info.txt', 'a') as f:
-            f.write("Starting point vertical distance from origine (mm): \t"+str(v_start));f.write('\n')
+            f.write(f"Starting point vertical distance from origine (mm):\t{v_start}\n")
             f.write("Line distance from origine (mm): \t"+str(line_shift));f.write('\n')
             f.write("Vertical length of the line (mm): \t"+str(v_length));f.write('\n')
             f.write("Number of measuring points: \t"+str(n_points));f.write('\n')
