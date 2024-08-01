@@ -1,0 +1,1 @@
+from .CoGenerator import CoordinatesGenerator
