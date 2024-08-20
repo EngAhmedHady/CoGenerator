@@ -1,7 +1,9 @@
 import numpy as np
 
+
+#%% inclined line functions
 def IntersectionPoint(M: list[float], A: list[float],
-                      Ref: list[tuple]) -> tuple[tuple[int, int]]:
+                      Ref: list[tuple]) -> tuple[float, float]:
     """
     Calculate the intersection point between two lines.
 
@@ -34,7 +36,7 @@ def IntersectionPoint(M: list[float], A: list[float],
     theta1 = np.rad2deg(np.arctan(M[0]))
     theta2 = np.rad2deg(np.arctan(M[1]))
 
-    Xint, Yint = None, None
+    Xint, Yint = np.inf, np.inf
 
     if theta1 != 0 and theta2 != 0 and theta1 - theta2 != 0:
         Xint = (A[1] - A[0]) / (M[0] - M[1])
@@ -48,8 +50,7 @@ def IntersectionPoint(M: list[float], A: list[float],
     else:
         print(f'{BCOLOR.WARNING}Warning:{BCOLOR.ENDC}{BCOLOR.ITALIC}Lines are parallel{BCOLOR.ENDC}')
 
-    Pint = (Xint, Yint)
-    return Pint
+    return Xint, Yint
 
 def h_shift_on_chord(AOA, line_angle, line_shift):
     third_angle = 180 - abs(AOA) - abs(line_angle)
@@ -83,6 +84,7 @@ def cascade_inc_line_plotting_pram(profile2_LE, profile2_TE,
                                    line_shift, line_slope, line_y_intr, pt_on_line,
                                    **kwargs):
     perp_slope = -1/line_slope if line_slope != 0 else np.inf
+    dist_from_origin = profile2_LE[:2]
     if line_shift >= 0:
         a4 = profile2_LE[1]-perp_slope*profile2_LE[0]
         x4, y4 = IntersectionPoint([line_slope,perp_slope],
@@ -99,5 +101,33 @@ def cascade_inc_line_plotting_pram(profile2_LE, profile2_TE,
                                    [a5,a4],
                                    [profile2_LE[:2],profile2_TE])
         dist_from_origin = (x5, y5)
-        perpendicular_intx = (x4, y4)
+    perpendicular_intx = (x4, y4)
     return dist_from_origin, perpendicular_intx
+
+#%% Point generator functions
+def generatNPRlist(n_points, NPR, Dis, dy_list):
+    # n_g: number of groups (number of runs)
+    n_g = 1 + max(0, int(np.ceil((n_points - NPR) / (NPR - 1))))
+
+    g_hieght = Dis
+    g_hieghts = []
+    i = 0
+    for n in range(n_g):
+        k = 1
+        while i < n_points-1 and k < NPR:
+            g_hieght += dy_list[i]
+            k += 1 
+            i += 1
+        g_hieghts.append(g_hieght)
+    
+    NPPR = NPR    
+    return [[NPPR, g_hieght] for g_hieght in g_hieghts]
+
+def dy_list_generator(y0, dy_list):
+    dy_new_list = []
+    for dy, l in dy_list:
+        n_point_dy = abs(round((l - y0) / dy))
+        dy_new_list.extend(dy*np.ones([n_point_dy]))
+        y0 += n_point_dy * dy
+    print(len(dy_new_list))
+    return dy_new_list

@@ -5,9 +5,11 @@ Created on Thu Sep 15 08:10:16 2022
 @author: Ahmed H. Hanfy
 """
 import sys
-import numpy as np
+import pandas as pd
+# import numpy as np
 sys.path.append(r'..\CoGenerator')
 from CoGenerator import CoordinatesGenerator as CG
+
 
 if __name__ == '__main__':
     #[76.2347,75.8262,77.2260,74.7054,81.8757,83.6850,85.6464,89.3003,92.1738,94.1656,96.0591]
@@ -23,10 +25,10 @@ if __name__ == '__main__':
     # LAZERinfo = [[226.1435400,24.94990000000,367.20],   # Leading  edge coordinates lower blade "Measured" [x00,y00,z00]
     #               [323.7721016,5.59196630381,367.20],   # Trailing edge coordinates lower blade "Measured" [x01,y01,z01]
     #               [273.616941797,58.896306915,367.20]]   # Leading  edge coordinates Upper blade "Measured"
-                   # [275.616941797,58.896306915,367.20]]   # Leading  edge coordinates Upper blade "Measured" [x10,y10,z10]
+                  # [275.616941797,58.896306915,367.20]]   # Leading  edge coordinates Upper blade "Measured" [x10,y10,z10]
     # TEAMAero Arun
     LAZERinfo = [[126.00,-134.50,362.60],   # Leading  edge coordinates lower blade "Measured" [x00,y00,z00]
-                  [173.615,-149.118,362.60],   # Trailing edge coordinates lower blade "Measured" [x01,y01,z01]
+                  [174.00,-149.50,362.60],   # Trailing edge coordinates lower blade "Measured" [x01,y01,z01]
                   [103.30,-155.30,362.60]]   # Leading  edge coordinates Upper blade "Measured"
 
     Profile_path     = r"Co-fig\profile.jpg"
@@ -60,19 +62,37 @@ if __name__ == '__main__':
     # Co_Generator.LineGenerator(lineInfo, invert = False,
     #                             arrows_color = 'w', text_color = 'w',
     #                             BGcolor = 'k',
+    #                             points_width = 3,
     #                             # preview_lengths = False,
     #                             legend_loc = 'upper right', legend_fsize = 30, points_size = 15,
     #                             )
 
-    # lineInfo = [70,-10,75,20] # [starting point, H-line distance, Vertical length, N-points]
-    # Co_Generator.LineGenerator(lineInfo, invert = False,
+    # lineInfo = [60,10,70,20] # [starting point, H-line distance, Vertical length, N-points]
+    # Co_Generator.LineGenerator(lineInfo,
+    #                             invert = False,
     #                             inclination = 'ParallelToLEs',
+    #                             points_width = 3,
     #                             # inclination = 'PerpendicularToChord',
     #                             # LineShiftRepresentation = 'DistanseOnCord',
     #                             # LineShiftRepresentation = 'HorizontalDistance',
     #                             arrows_color = 'w', text_color = 'w',
+    #                             NPR = [[4,10],[6,75]],
     #                             legend_loc = 'lower right', legend_fsize = 20,
-    #                             figxlim = [-80,200], figylim = [-40,80], BGcolor = 'k')
+    #                             # figxlim = [-80,200], figylim = [-40,80], BGcolor = 'k'
+    #                             )
+
+    # lineInfo = [13,-10,45,20] # [starting point, H-line distance, Vertical length, N-points]
+    # Co_Generator.LineGenerator(lineInfo,
+    #                            invert = False,
+    #                            inclination = 'ParallelToLEs',
+    #                            points_width = 3,
+    #                             # inclination = 'PerpendicularToChord',
+    #                             # LineShiftRepresentation = 'DistanseOnCord',
+    #                             # LineShiftRepresentation = 'HorizontalDistance',
+    #                            arrows_color = 'w', text_color = 'w',
+    #                            legend_loc = 'lower right', legend_fsize = 20,
+    #                            figxlim = [-80,200], figylim = [-40,80], BGcolor = 'k'
+    #                            )
 
     # lineInfo = [32,50,57,20] # [starting point, H-line distance, Vertical length, N-points]
     # Co_Generator.LineGenerator(lineInfo, invert = False, inclination = 'ParallelToLEs',
@@ -92,20 +112,41 @@ if __name__ == '__main__':
 
     # l_len = (chord_len-2.8765)*np.cos(theta)+10
     # #
-    # lineInfo = [20,-10,60,40] # [starting point, H-line distance, Vertical length, N-points]
+    # lineInfo = [15,-8.375515,60,40] # [starting point, H-line distance, Vertical length, N-points]
     # # lineInfo = [32,50,57,20] # [starting point, H-line distance, Vertical length, N-points]
     # Co_Generator.LineGenerator(lineInfo, invert = False,
     #                             inclination = 'ParallelToLEs',
-    #                             preview_lengths = False,)
+    #                             # points_width = 5,
+    #                             # points_display = 'line',
+    #                             show_legend = False,
+    #                             preview_lengths = True,)
+
+    # path = r'D:\Arun\Experimental campaign\Marcin_travers.csv'
+    # Df = pd.read_csv(path, sep=',')
+    # Co_Generator.ax.plot(Df['X [mm]'], Df['Y [mm]'])
 
     # l_len = (chord_len-2.8765)*np.cos(theta)+10
 
     # lineInfo = [17.5,-l_len,65,40] # [starting point, H-line distance, Vertical length, N-points]
-    lineInfo = [17.5,-10,65,40] # [starting point, H-line distance, Vertical length, N-points]
+    lineInfo = [17.5,-10,65,50] # [starting point, H-line distance, Vertical length, N-points]
+    Delta_l  = [[-2.5, -8],
+                [-1.0, -10],
+                [-0.5, -20],
+                [-1.0, -22],
+                [-2.5, -25],
+                [-1.0, -27],
+                [-0.5, -36],
+                [-1.0, -38],
+                [-2.5, -45],
+                [-1.0, -47],
+                [-0.5, -56],
+                [-1.0, -58],
+                [-2.5, -65]]  #[[Distance between each point(mm), distance from surface(mm)], ... ]
     Co_Generator.LineGenerator(lineInfo, invert = False,
                                 inclination = 'ParallelToLEs',
-                                # NPR = [[4,50],[6,300]],
-                              # inclination = 'PerpendicularToChord',
+                                NPR = [[4,10],[6,30],[4,45],[6,70]],
+                                # dy_list = Delta_l,
+                                # inclination = 'PerpendicularToChord',
                                 arrows_color = 'w', text_color = 'w',
                                 legend_loc = 'lower right', legend_fsize = 20,
                                 figxlim = [-120,150], figylim = [-80,40], BGcolor = 'k')
@@ -155,11 +196,12 @@ if __name__ == '__main__':
     #             [5.00,20.0]]
     # lineInfo = [0.2,Delta_l,40]
     # Co_Generator.BLLineGenerator(CADinfo,lineInfo,Imageindex = 1, invert = False,
-    #                               show_legend = False, points_size = 15, line_width = 3,
-    #                               points_display = 'line', points_color = 'tab:red',
-    #                               figxlim = [-40,120], figylim = [-40,80],
-    #                               # figxlim = [-20,105], figylim = [-25,20],
-    #                               display_BL_calculation = 1)
+    #                               show_legend = False, points_size = 10, line_width = 3,
+    #                               # points_display = 'line', points_color = 'tab:red',
+    #                                 # figxlim = [60,85], figylim = [-20,10],
+    #                                 figxlim = [-20,105], figylim = [-25,20],
+    #                                 display_BL_calculation = 1
+    #                               )
 
 
 
@@ -170,13 +212,15 @@ if __name__ == '__main__':
     #             [0.25,4.00],
     #             [1.00,10.0],
     #             [5.00,20.0]]
-    # lineInfo = [0.2,Delta_l,31]
+    # lineInfo = [0.2,Delta_l,30]
     # Co_Generator.BLLineGenerator(CADinfo,lineInfo, invert = False,
-    #                              NPR = [[4,1],[6,34]],
-    #                              show_legend = False, points_size = 15,
-    #                              line_width = 15, points_display = 'line',
-    #                              points_color = 'tab:orange',
-    #                              figxlim = [-40,120], figylim = [-40,80],)
+    #                               NPR = [[4,1],[6,34]],
+    #                               show_legend = False, points_size = 15,
+    #                               # line_width = 15, points_display = 'line',
+    #                               points_color = 'tab:orange',
+    #                               # figxlim = [-40,120], figylim = [-40,80],
+    #                               figxlim = [55,65], figylim = [-7,15],
+    #                               )
 
     # Co_Generator.ax.legend(['0.75x/c','0.60x/c','0.25x/c'])
 
@@ -189,8 +233,12 @@ if __name__ == '__main__':
     #             [5.00,20.0]]
     # lineInfo = [0.2,Delta_l,34]
     # Co_Generator.BLLineGenerator(CADinfo,lineInfo,Imageindex = 1,
-    #                              invert = False, NPR = [[4,1],[6,34]],
-    #                              figxlim = [-40,120], figylim = [-40,80],)
+    #                               invert = False, NPR = [[4,1],[6,34]],
+    #                               display_BL_calculation = 1,
+    #                               # points_display = 'line',
+    #                               line_width = 3,
+    #                               figxlim = [-40,120], figylim = [-40,80],
+    #                               )
 
     # CADinfo  = [0.5, 92.11884, 5.48382]
     # Delta_l  = [[0.10,1.00],
@@ -199,7 +247,9 @@ if __name__ == '__main__':
     #             [1.00,10.0],
     #             [5.00,20.0]]
     # lineInfo = [0.25,Delta_l,31]
-    # Co_Generator.BLLineGenerator(CADinfo,lineInfo,Imageindex = 2, invert = False, NPR = [[4,1],[6,31]])
+    # Co_Generator.BLLineGenerator(CADinfo,lineInfo,Imageindex = 2,
+    #                              invert = False, NPR = [[4,1],[6,31]],
+    #                              figxlim = [-20,105], figylim = [-25,20],)
 
     # CADinfo  = [0.6, 89.3003, 5.617]
     # Delta_l  = [[5,5]]
@@ -214,8 +264,9 @@ if __name__ == '__main__':
     #             [2.50,15.0]]
     # lineInfo = [0.1,Delta_l,31]
     # Co_Generator.BLLineGenerator(CADinfo,lineInfo,Imageindex = 3, invert = False, NPR = [[4,1],[6,41]],
-    #                               show_legend = False, points_size = 15, line_width = 20,
+    #                               show_legend = False, points_size = 5, line_width = 3,
     #                               figxlim = [-20,105], figylim = [-25,20],
+    #                               display_BL_calculation = 1,
     #                               points_display = 'line', points_color = 'tab:green')
 
     # CADinfo  = [0.1, 100, 2.6]

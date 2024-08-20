@@ -2,10 +2,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import transforms
-import matplotlib.patches as mpatch
+# import matplotlib.patches as mpatch
+from matplotlib.patches import Arc, Rectangle
 
 def ImageVisualization(ax, lazer_info: list[list[float]],
-                       BG: tuple[str, tuple[int]] = None, reverse: bool=True,
+                       BG: tuple[str, tuple[int,int,int,int]] = None, reverse: bool=True,
                        **kwargs):
     """
     Visualize data points and optionally a background image on a given axis.
@@ -126,12 +127,16 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
     # ``v_start``: starting point vertical distance from origine
     # ``v_length``: full vertical length of the line
     v_start,_,v_length,_ = lineInfo
-
+    
+    # Chord intersection point with the traverse line
     x3, y3 = kwargs.get('chord_intx', (None,None))
+    # perpendicular line intersection point with the traverse line
     x4, y4 = kwargs.get('perpendicular_intx', (None,None))
+    # Cascade fourth point "profile2_TE"
     x_other, y_other = kwargs.get('profile2_TE', (None,None))
+    # distance from origin "origin_LE" in case of wake and inclination = 'ParallelToLEs'
     x5, y5 = kwargs.get('dist_from_origin', (None,None))
-    # ``Theta``: line inclination angle
+    # ``Theta``: the traverse line inclination angle
     Theta = kwargs.get('Theta', None)
     dim_size = kwargs.get('dim_size', 30)
     points_size = kwargs.get('points_size', 8)
@@ -244,7 +249,7 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
             ax.plot([x_other, x5],
                     [y_other, y5],
                     'y--', ms=5, linewidth=0.5, label='_Hidden')
-            rect = mpatch.Rectangle((x5, y5), 2, 2, facecolor='y',
+            rect = Rectangle((x5, y5), 2, 2, facecolor='y',
                                     angle=270+DegTheta3)
             ax.add_patch(rect)
 
@@ -260,7 +265,7 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
                 'y--', ms=5, linewidth=0.5, label='_Hidden')
 
 
-        rect = mpatch.Rectangle((x4, y4), 2, 2, facecolor='y',
+        rect = Rectangle((x4, y4), 2, 2, facecolor='y',
                                 angle=270+DegTheta3)
         ax.add_patch(rect)
 
@@ -270,3 +275,39 @@ def PointsInfoVisualization(ax, lazer_info: list[list[float]],
                 rotation=270+DegTheta3)
 
     return ax
+
+def display_BL_calcu_data(ax, origin_LE, origin_TE,
+                          DegTheta1, Surface_V_toH_Angle,
+                          p1, p2, m2, **kwargs):
+
+    line_width = kwargs.get('line_width', 1)
+    ax.plot([origin_LE[0], origin_TE[0]],
+            [origin_LE[1], origin_TE[1]], lw=line_width)
+
+    arc1 = Arc(origin_TE,20, 20,
+               theta1=180+DegTheta1, theta2=180,
+               color = 'k', lw =line_width)
+
+    ax.add_patch(arc1);
+    # self.ax.text(LowerTE[0]-13 ,LowerTE[1]+0.75 , r'$\theta_1$', color = 'tab:red');
+
+    x1, y1 = p1
+    ax.plot([x1,x1+15], [y1,y1],
+            '--', color = 'k', lw =line_width)
+
+    ax.plot([origin_TE[0],origin_TE[0]-15],
+                 [origin_TE[1],origin_TE[1]],
+                 '--', color = 'k', lw =line_width)
+
+    x2, y2 = p2
+    a3 = y2 - (-1 / m2) * x2
+    y3 = (-1 / m2) * (x2 - 15) + a3
+    y4 = (-1 / m2) * (x2 + 3) + a3
+
+    ax.plot([x2-15, x2+3], [y3, y4],
+                 '--', lw=line_width, color='tab:blue')
+
+    rect = Rectangle((x2, y2), 2, 2, facecolor='tab:blue',
+                            angle=270+Surface_V_toH_Angle)
+
+    ax.add_patch(rect)
